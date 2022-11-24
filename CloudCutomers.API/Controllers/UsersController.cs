@@ -18,8 +18,14 @@ namespace CloudCustomers.API.Controllers
         [HttpGet(Name = "GetUsers")]
         public async Task<IActionResult> Get()
         {
-            var users = _usersService.GetAllUsers();
-            return Ok("Working");
+            var users = await _usersService.GetAllUsers();
+            if (users.Any())
+            {
+                return Ok(users);
+            }
+
+            return NotFound();
+
         }
     }
 }

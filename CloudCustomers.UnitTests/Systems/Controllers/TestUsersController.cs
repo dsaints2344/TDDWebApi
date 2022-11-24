@@ -44,4 +44,61 @@ public class TestUsersController
             Times.AtLeastOnce);
 
     }
-}
+
+    [Fact]
+    public async Task Get_OnSuccess_ReturnListOfUsers()
+    {
+        //Arrange
+        var mockUsersService = new Mock<IUsersService>();
+
+        mockUsersService
+            .Setup(service => service.GetAllUsers())
+            .ReturnsAsync(new List<User>()
+            {
+                new ()
+                {
+                    Id = 1,
+                    Name = "David",
+                    Address = new Address()
+                    {
+                        Street = "124 Pina",
+                        City = "Santo Domingo",
+                        ZipCode = "53704"
+                    },
+                    Email = "ddelossantosmateo@hotmail.com"
+                }
+            });
+        var controller = new UsersController(mockUsersService.Object);
+
+        //Act
+
+        var result = await controller.Get();
+
+        //Assert
+
+        result.Should().BeOfType<OkObjectResult>();
+        var objectResult = (OkObjectResult) result;
+
+        objectResult.Value.Should().BeOfType<List<User>>();
+    }
+
+    [Fact]
+    public async Task Get_OnNoUserFound_Returns404()
+    {
+        //Arrange
+        var mockUsersService = new Mock<IUsersService>();
+
+        mockUsersService
+            .Setup(service => service.GetAllUsers())
+            .ReturnsAsync(new List<User>());
+        var controller = new UsersController(mockUsersService.Object);
+
+        //Act
+
+        var result = await controller.Get();
+
+        //Assert
+
+        result.Should().BeOfType<NotFoundResult>();
+    }
+} 
